@@ -36,11 +36,6 @@ FROM registry.access.redhat.com/ubi9/python-312:latest
 
 # Copy the installed Python site-packages from the builder
 COPY --from=builder /opt/app-root /opt/app-root
-
-# Ensure the correct ownership for the app directory
-RUN chown -R 1001:0 /opt/app-root && \
-    chmod -R g+u /opt/app-root
-
 # Switch to the default non-root user
 USER 1001
 
