@@ -13,6 +13,7 @@ from app.services.ipa import ipa_host_add, build_fqdn
 
 router = APIRouter()
 
+
 @router.post("/mutate")
 async def mutate_vm(
     background_tasks: BackgroundTasks, review: Dict[str, Any] = Body(...)
@@ -86,12 +87,14 @@ async def mutate_vm(
 
     patch = []
     otp = None
+    pinned_server = None
     enrollment_success = False
     status_msg = ""
 
     # 1. Attempt IPA Enrollment
     try:
-        otp = ipa_host_add(vm_name, namespace, admission_uid)
+        otp, pinned_server = ipa_host_add(vm_name, namespace, admission_uid)
+
         enrollment_success = True
         fqdn = build_fqdn(vm_name, namespace)
         status_msg = f"Enrolled as {fqdn}"
@@ -123,7 +126,6 @@ async def mutate_vm(
 
     if enrollment_success:
         fqdn = build_fqdn(vm_name, namespace)
-        ipa_host, _ = ipa_resolve_srv("_kerberos", "_tcp", CONFIG["domain"])
 
         vm_template = vm_spec.get("template", {})
         template_spec = vm_template.get("spec", {})
@@ -147,7 +149,7 @@ async def mutate_vm(
 
         ipa_cmd_parts = [
             "ipa-client-install",
-            f"--server={ipa_host}",
+            f"--server={pinned_server}",
             f"--hostname={fqdn}",
             f"--domain={CONFIG['DOMAIN']}",
             f"--realm={CONFIG['DOMAIN'].upper()}",

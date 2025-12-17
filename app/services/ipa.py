@@ -1,6 +1,6 @@
 from python_freeipa import Client
 from app.config import CONFIG, logger
-from typing import List
+from typing import List, Tuple
 import datetime
 import random
 import dns.resolver
@@ -125,20 +125,23 @@ def execute_ipa_command(client, command, *args, **kwargs):
 
 
 # --- Action: Add Host to IPA ---
-def ipa_host_add(vm_name: str, namespace: str, vm_uuid: str) -> str:
+def ipa_host_add(vm_name: str, namespace: str, vm_uuid: str) -> Tuple[str, str]:
     client_ipa = get_ipa_client()
     fqdn = build_fqdn(vm_name, namespace)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     desc_text = f"Created by virt-joiner at {timestamp} | K8s UID: {vm_uuid}"
 
-    logger.info(f"Registering host: {fqdn}")
+    logger.info(f"Registering host: {fqdn} on server {client_ipa.host}")
     try:
         execute_ipa_command(
             client_ipa, "host_add", fqdn, force=True, description=desc_text
         )
         otp = vm_uuid
         execute_ipa_command(client_ipa, "host_mod", fqdn, userpassword=otp)
-        return otp
+
+        # Return the OTP *AND* the server we actually talked to
+        return otp, client_ipa.host
+
     except Exception as e:
         logger.error(f"IPA Add Error for {fqdn}: {e}")
         raise e
