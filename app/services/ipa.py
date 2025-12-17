@@ -1,6 +1,6 @@
 from python_freeipa import Client
 from app.config import CONFIG, logger
-from typing import Tuple
+from typing import Tuple, Optional
 import datetime
 import random
 import dns.resolver

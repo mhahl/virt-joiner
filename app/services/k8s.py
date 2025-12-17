@@ -7,7 +7,7 @@ from kubernetes_asyncio import client, config, watch
 from app.config import CONFIG, logger
 
 # Import IPA actions needed for the polling/deletion logic
-from app.services.ipa import ipa_host_del, get_ipa_client, execute_ipa_command
+from app.services.ipa import ipa_host_del, get_ipa_client, execute_ipa_command, ipa_resolve_srv
 
 
 # --- HELPER: K8s Event Sender ---
