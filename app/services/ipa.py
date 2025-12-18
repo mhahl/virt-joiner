@@ -55,7 +55,7 @@ def ipa_resolve_srv(service: str, protocol: str, domain: str) -> List[str]:
             results.extend(candidates)
 
     except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
-        logger.info(f"No SRV records found for {query_name} or domain missing")
+        logger.debug(f"No SRV records found for {query_name} or domain missing")
     except Exception as e:
         logger.info(f"An error occurred during SRV lookup: {e}")
 
