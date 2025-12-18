@@ -67,7 +67,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      pull-requests: write # Required for commenting on PRs
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -194,21 +193,24 @@ jobs:
           registry: ${{ env.REGISTRY }}
 
       # ---------------------------------------------------------
-      # NOTIFY FORKS (Optional)
+      # NOTIFY FORKS (Log to Console/Summary)
       # ---------------------------------------------------------
-      - name: Comment on PR (Forks Only)
-        if: env.IS_FORK == 'true' && github.event_name == 'pull_request'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const tags = '${{ steps.meta.outputs.tags }}'.split('\n').filter(t => t.trim().length > 0);
-            const image = tags[0];
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Test Build Available!**\n\nSince this is an external PR, the build was pushed to a temporary registry (valid for 24h).\n\nTo test this image:\n\`\`\`bash\npodman pull ${image}\n\`\`\``
-            })
+      - name: Log Public Image URL
+        if: env.IS_FORK == 'true'
+        run: |
+          # Grab the first tag (the ttl.sh one)
+          IMAGE_REF=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
+
+          echo "======================================================="
+          echo "🚀 EXTERNAL BUILD AVAILABLE (Valid for 24h)"
+          echo "To test this image, run:"
+          echo ""
+          echo "podman pull $IMAGE_REF"
+          echo ""
+          echo "======================================================="
+
+          # Create a GitHub Notice (Shows up on the main Run Summary page)
+          echo "::notice title=Test Image Available::External build pushed! Run: podman pull $IMAGE_REF"
 
   # ------------------------------------------------------------------
   # JOB 3: CREATE GITHUB RELEASE
