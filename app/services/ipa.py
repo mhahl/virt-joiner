@@ -28,7 +28,7 @@ def ipa_resolve_srv(service: str, protocol: str, domain: str) -> List[str]:
         answers = dns.resolver.resolve(query_name, "SRV")
 
         if not answers:
-            logger.info(f"No SRV records found for {query_name}")
+            logger.debug(f"No SRV records found for {query_name}")
             return []
 
         # Group records by priority
