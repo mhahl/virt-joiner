@@ -211,7 +211,7 @@ async def poll_ipa_keytab(namespace, name, fqdn, timeout_minutes=15):
                     f"Failed to reconnect during polling: {re_connect_error}"
                 )
 
-        await asyncio.sleep(30)
+        await asyncio.sleep(10)
 
     logger.warning(f"Keytab watcher timed out for {fqdn}")
     await send_delayed_creation_event(
