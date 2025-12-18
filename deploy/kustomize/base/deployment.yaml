@@ -22,7 +22,8 @@ spec:
           ports:
             - containerPort: 8443
           envFrom:
-            - secretRef: virt-joiner-config
+            - secretRef:
+                name: virt-joiner-config
           volumeMounts:
             - name: certs
               mountPath: /var/run/secrets/serving-cert
