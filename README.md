@@ -200,9 +200,11 @@ webhooks:
 ```
 
 #### Service Discovery
+
 `virt-joiner` attempts to locate FreeIPA servers in the following order:
-1.  **DNS SRV Records:** It queries `_kerberos._tcp.<DOMAIN>` to find all available servers. If multiple records are found, it respects priority and randomizes weight for load balancing.
-2.  **Static Configuration:** If no SRV records are found, it falls back to the `IPA_HOST` variable. This can be a single host or a comma-separated list (e.g., `ipa1.lab.com,ipa2.lab.com`).
+
+1. **DNS SRV Records:** It queries `_kerberos._tcp.<DOMAIN>` to find all available servers. If multiple records are found, it respects priority and randomizes weight for load balancing.
+2. **Static Configuration:** If no SRV records are found, it falls back to the `IPA_HOST` variable. This can be a single host or a comma-separated list (e.g., `ipa1.lab.com,ipa2.lab.com`).
 
 ## ⚙️ Configuration
 
