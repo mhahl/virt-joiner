@@ -1,13 +1,11 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
+from kubernetes_asyncio import client
 from app.services.k8s import (
     send_delayed_creation_event,
     check_should_enroll,
     poll_ipa_keytab,
 )
-
-# Import the Fake exception class from where we injected it in conftest
-from kubernetes_asyncio import client
 
 
 @pytest.mark.asyncio
@@ -112,8 +110,11 @@ async def test_keytab_poll_reconnects_on_error(mocker):
     mock_client_1 = MagicMock(name="client_1")
     mock_client_2 = MagicMock(name="client_2")
 
-    # First call returns client 1, Second call returns client 2 (failover)
-    mock_get_client.side_effect = [mock_client_1, mock_client_2]
+    # UPDATED: Side effects must be TUPLES (client, hostname)
+    mock_get_client.side_effect = [
+        (mock_client_1, "ipa1.example.com"),
+        (mock_client_2, "ipa2.example.com"),
+    ]
 
     # 3. Mock the Delayed Event Sender (so we don't trigger the VM lookup loop)
     mock_delayed_event = mocker.patch(
